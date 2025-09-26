@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/contexts/authContext";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
@@ -10,6 +11,7 @@ export default function Navbar() {
   const handleLogout = async () => {
     signOut();
     router.push("/signin");
+    toast.success("Sign Out, Please login to continue");
   };
 
   if (!user) {
@@ -27,8 +29,8 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600">
-              Welcome, {user?.email?.split("@")[0]}
+            <span className="text-sm text-gray-600 ">
+              Welcome, <span className="uppercase text-md font-semibold text-black">{user?.email?.split("@")[0]}</span>
             </span>
             <button
               onClick={handleLogout}

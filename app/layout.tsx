@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from 'sonner';
+
 
 import Navbar from "@/components/narbar";
 import { AuthProvider } from "@/contexts/authContext";
@@ -33,6 +35,13 @@ export default function RootLayout({
         <AuthProvider>
           <Navbar />
           {children}
+          <Toaster toastOptions={{
+            classNames: {
+              error: '!bg-red-500 !text-white',
+              success: '!bg-green-500 !text-black',
+              warning: '!bg-orange-400 !text-black',
+            },
+          }}  />
         </AuthProvider>
       </body>
     </html>

@@ -60,7 +60,11 @@ export async function POST(request: NextRequest) {
 
   await inngest.send({
     name: "newsletter.schedule",
-    data: {},
+    data: {
+      categories,
+      frequency,
+      email,
+    },
   });
 
   return NextResponse.json(
@@ -72,4 +76,91 @@ export async function POST(request: NextRequest) {
       status: 200,
     }
   );
+}
+
+export async function GET() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json(
+      {
+        error: "You must be logged in to save preferences.",
+      },
+      {
+        status: 401,
+      }
+    );
+  }
+
+  try {
+    const { data: preferences, error: fetchErrors } = await supabase
+      .from("user_preferences")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
+
+    if (fetchErrors) {
+      return NextResponse.json(
+        { error: "Failed to get preferences" },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    return NextResponse.json(preferences);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ msg: "Internal error" }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json(
+      {
+        error: "You must be logged in to save preferences.",
+      },
+      {
+        status: 401,
+      }
+    );
+  }
+
+  try {
+    const body = await request.json();
+    const { is_active } = body;
+
+    const { error: updateErrors } = await supabase
+      .from("user_preferences")
+      .update({ is_active })
+      .eq("user_id", user.id);
+
+    if (updateErrors) {
+      return NextResponse.json(
+        { error: "Failed to update preferences" },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    return NextResponse.json({
+      msg: "update done",
+      success: true,
+    });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ msg: "Internal error" }, { status: 500 });
+  }
 }

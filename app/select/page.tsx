@@ -2,6 +2,7 @@
 import { useAuth } from "@/contexts/authContext";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { toast } from "sonner";
 
 const categories = [
   {
@@ -61,12 +62,12 @@ export default function Select() {
   async function handleSavePreferences(e: FormEvent) {
     e.preventDefault();
     if (selectedCategories.length === 0) {
-      alert("Please select at least one category");
+      toast.warning("Please select at least one category");
       return;
     }
 
     if (!user) {
-      alert("Please sign in to continue");
+      toast.error("Please sign in to continue");
       return;
     }
     try {
@@ -81,14 +82,15 @@ export default function Select() {
       });
 
       if (!response.ok) {
+        toast.error("Failed to save preferences");
         throw new Error("Failed to save preferences");
       }
-      alert(
+      toast.success(
         "Your newsletter preferences have been saved!  you will start reciving them soon"
       );
       router.push("/dashboard");
     } catch (error) {
-      alert("Failed to save preferences, please try againg");
+      toast.error("Failed to save preferences, please try againg");
     }
   }
 

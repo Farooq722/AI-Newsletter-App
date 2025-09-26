@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function SigninPage() {
   const [isSignup, setIsSignup] = useState(false);
@@ -27,8 +28,12 @@ export default function SigninPage() {
           password,
         });
 
-        if (error) throw error;
+        if (error) {
+          toast.error("Enter Valid Credentials");
+          throw error
+        };
         router.push("/dashboard");
+        toast.success("Sign In, Enjoy the service");
       }
     } catch (error) {}
   }
